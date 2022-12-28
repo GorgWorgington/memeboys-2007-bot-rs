@@ -1,8 +1,9 @@
 use std::fs;
-use serenity::{async_trait, model::prelude::{Message, Ready}, prelude::*};
+use serenity::{async_trait, model::{prelude::{Message, Ready}, user::OnlineStatus}, prelude::*};
 
 mod config;
 use config::Config;
+
 struct Handler;
 
 #[async_trait]
@@ -31,7 +32,8 @@ async fn main() {
   let token = config.token();
 
   // Set gateway intents, which decides what events the bot will be notified about
-  let intents = GatewayIntents::GUILD_MESSAGES
+  let intents =
+        GatewayIntents::GUILD_MESSAGES
       | GatewayIntents::DIRECT_MESSAGES
       | GatewayIntents::MESSAGE_CONTENT;
 
@@ -39,7 +41,10 @@ async fn main() {
   // automatically prepend your bot token with "Bot ", which is a requirement
   // by Discord for bot users.
   let mut client =
-      Client::builder(&token, intents).event_handler(Handler).await.expect("Err creating client");
+      Client::builder(&token, intents)
+      .event_handler(Handler)
+      .presence(None, OnlineStatus::Invisible)
+      .await.expect("Error creating client");
 
   // Finally, start a single shard, and start listening to events.
   //
