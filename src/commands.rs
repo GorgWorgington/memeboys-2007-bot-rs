@@ -12,8 +12,8 @@ pub use self::memeroll::*;
 
 // User data, which is stored and accessible in all command invocations
 pub struct Data {
-  meme_channel_id: ChannelId,
-  meme_msgs: Vec<Message>,
+  pub meme_channel_id: ChannelId,
+  pub meme_msgs: Vec<Message>,
 }
 
 type Error = Box<dyn std::error::Error + Send + Sync>;
