@@ -28,6 +28,7 @@ async fn main() {
             commands: vec![
               commands::age(),
               commands::register(),
+              commands::coinflip(),
               ],
             ..Default::default()
         })
