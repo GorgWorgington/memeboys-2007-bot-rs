@@ -1,25 +1,11 @@
 use std::fs;
-use serenity::{async_trait, model::{prelude::{Message, Ready}, user::OnlineStatus}, prelude::*};
+use commands::Data;
+use poise::serenity_prelude as serenity;
 
+mod commands;
 mod config;
 use config::Config;
 
-struct Handler;
-
-#[async_trait]
-impl EventHandler for Handler {
-  async fn message(&self, ctx: Context, msg: Message) {
-    if msg.content == "!ping" {
-      if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
-        println!("Error sending message: {:?}", why);
-      }
-    }
-  }
-
-  async fn ready(&self, _: Context, ready: Ready) {
-    println!("{} is connected!", ready.user.name);
-  }
-}
 
 #[tokio::main]
 async fn main() {
@@ -33,24 +19,26 @@ async fn main() {
 
   // Set gateway intents, which decides what events the bot will be notified about
   let intents =
-    GatewayIntents::GUILD_MESSAGES |
-    GatewayIntents::DIRECT_MESSAGES |
-    GatewayIntents::MESSAGE_CONTENT;
+    serenity::GatewayIntents::GUILD_MESSAGES |
+    serenity::GatewayIntents::DIRECT_MESSAGES |
+    serenity::GatewayIntents::MESSAGE_CONTENT;
 
-  // Create a new instance of the Client, logging in as a bot. This will
-  // automatically prepend your bot token with "Bot ", which is a requirement
-  // by Discord for bot users.
-  let mut client =
-      Client::builder(&token, intents)
-      .event_handler(Handler)
-      .presence(None, OnlineStatus::Invisible)
-      .await.expect("Error creating client");
+  let framework = poise::Framework::builder()
+        .options(poise::FrameworkOptions {
+            commands: vec![
+              commands::age(),
+              commands::register(),
+              ],
+            ..Default::default()
+        })
+        .token(token)
+        .intents(intents)
+        .setup(|ctx, _ready, framework| {
+            Box::pin(async move {
+                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
+                Ok(Data {})
+            })
+        });
 
-  // Finally, start a single shard, and start listening to events.
-  //
-  // Shards will automatically attempt to reconnect, and will perform
-  // exponential backoff until it reconnects.
-  if let Err(why) = client.start().await {
-      println!("Client error: {:?}", why);
-  }
+    framework.run().await.unwrap();
 }
