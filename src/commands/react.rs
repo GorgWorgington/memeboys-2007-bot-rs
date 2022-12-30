@@ -1,7 +1,24 @@
 use crate::commands::{Context, Error};
 
 /// Post a reaction image/video
-#[poise::command(prefix_command, slash_command, subcommands("beans", "okretard", "bruh", "nigra", "circus", "green", "gawk", "penismusic", "timesup", "acecringe", "acewrong", "acelogic1", "acelogic2", "spongechoonch", "mrbeandisgust", "hollow"))]
+#[poise::command(prefix_command, slash_command, subcommands(
+    "beans",
+    "okretard", 
+    "bruh", 
+    "nigra", 
+    "circus", 
+    "green", 
+    "gawk", 
+    "penismusic", 
+    "timesup", 
+    "acecringe", 
+    "acewrong", 
+    "acelogic1", 
+    "acelogic2", 
+    "spongechoonch", 
+    "mrbeandisgust",
+    "hollow"
+))]
 pub async fn react(_ctx: Context<'_>) -> Result<(), Error> { Ok(()) }
 
 /// (Image) This n eating beans
