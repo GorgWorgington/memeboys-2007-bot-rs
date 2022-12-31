@@ -1,6 +1,6 @@
-use std::{fs, borrow::BorrowMut};
+use std::{fs};
 use commands::Data;
-use poise::{serenity_prelude::{self as serenity, ChannelId, EventHandler, Context, Ready}, async_trait, futures_util::StreamExt};
+use poise::{serenity_prelude::{self as serenity, ChannelId }, futures_util::StreamExt};
 
 mod commands;
 mod config;
@@ -54,7 +54,7 @@ async fn main() {
                                 data.meme_msgs.push(message);
                                 count += 1;
                                 println!("added {} memes", count);
-                                if count > 100 { break };
+                                // if count > 10 { break };
                             }
                         },
                         Err(error) => eprintln!("Uh oh! Error: {}", error),
