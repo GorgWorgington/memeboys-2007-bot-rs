@@ -1,6 +1,6 @@
 use crate::commands::{Context, Error};
 use rand::seq::SliceRandom;
-use poise::serenity_prelude::{self as serenity, Timestamp};
+use poise::serenity_prelude::{self as serenity};
 
 
 /// Posts a meme randomly from #image_post_memes
