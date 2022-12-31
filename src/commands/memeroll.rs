@@ -1,6 +1,6 @@
 use crate::commands::{Context, Error};
 use rand::seq::SliceRandom;
-use poise::serenity_prelude as serenity;
+use poise::serenity_prelude::{self as serenity};
 
 
 /// Posts a meme randomly from #image_post_memes
@@ -35,10 +35,11 @@ pub async fn memeroll(
                                         .disabled(true)
                                 })
                             }
+                        let timestamp = selected_message.timestamp.format("%Y-%m-%d %H:%M");
                         ret = ret.create_button(|button| {
                             button
                                 .style(serenity::ButtonStyle::Link)
-                                .label("Original post")
+                                .label(format!("{}, {}", selected_message.author.name, timestamp))
                                 .url(selected_message.link())
                         });
                         ret
