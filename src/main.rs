@@ -50,7 +50,7 @@ async fn main() {
                 while let Some(message_result) = messages.next().await {
                     match message_result {
                         Ok(message) => {
-                            if message.embeds.len() > 0 {
+                            if message.embeds.len() > 0 || message.attachments.len() > 0 {
                                 data.meme_msgs.push(message);
                                 count += 1;
                                 println!("added {} memes", count);
