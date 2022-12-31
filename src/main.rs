@@ -34,6 +34,7 @@ async fn main() {
               commands::age(),
               commands::register(),
               commands::coinflip(),
+              commands::stats(),
               ],
             ..Default::default()
         })
