@@ -38,7 +38,7 @@ async fn main() {
         .intents(intents)
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
-
+                ctx.invisible().await;
                 let mut data = Data {
                     meme_channel_id: ChannelId(274323160143233025),
                     meme_msgs: Vec::new(),
