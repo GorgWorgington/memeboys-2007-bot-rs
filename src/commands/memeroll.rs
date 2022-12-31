@@ -10,7 +10,7 @@ pub async fn memeroll(
     let selected_message = ctx.data().meme_msgs.choose(&mut rand::thread_rng()).expect("TODO handle meme_msgs being empty");
     
     let image_url;
-    if selected_message.attachments.len() <= 0 {
+    if selected_message.attachments.len() > 0 {
         image_url = &selected_message.attachments[0].url;
     } else {
         image_url = &selected_message.content;

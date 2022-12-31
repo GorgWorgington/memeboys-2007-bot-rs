@@ -1,6 +1,6 @@
-use std::fs;
+use std::{fs, borrow::BorrowMut};
 use commands::Data;
-use poise::serenity_prelude::{self as serenity, ChannelId};
+use poise::{serenity_prelude::{self as serenity, ChannelId, EventHandler, Context, Ready}, async_trait, futures_util::StreamExt};
 
 mod commands;
 mod config;
@@ -9,11 +9,6 @@ use config::Config;
 
 #[tokio::main]
 async fn main() {
-
-  let data = Data {
-    meme_channel_id: ChannelId(274323160143233025),
-    meme_msgs: Vec::new(),
-  };
 
   //TODO improve error reporting (don't allow panics)
   let config_file = fs::read_to_string("config.json").expect("Failed to read config file");
@@ -43,6 +38,30 @@ async fn main() {
         .intents(intents)
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
+
+                let mut data = Data {
+                    meme_channel_id: ChannelId(274323160143233025),
+                    meme_msgs: Vec::new(),
+                };
+
+                let mut count = 0;
+
+                let mut messages = data.meme_channel_id.messages_iter(&ctx).boxed();
+                while let Some(message_result) = messages.next().await {
+                    match message_result {
+                        Ok(message) => {
+                            if message.embeds.len() > 0 {
+                                data.meme_msgs.push(message);
+                                count += 1;
+                                println!("added {} memes", count);
+                                if count > 100 { break };
+                            }
+                        },
+                        Err(error) => eprintln!("Uh oh! Error: {}", error),
+                    }
+                }
+                println!("found {} memes", count);
+
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(data)
             })
