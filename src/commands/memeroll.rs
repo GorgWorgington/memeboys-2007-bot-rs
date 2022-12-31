@@ -7,8 +7,14 @@ use rand::seq::SliceRandom;
 pub async fn memeroll(
     ctx: Context<'_>,
 ) -> Result<(), Error> {
-    let selected_message = ctx.data().meme_msgs.choose(&mut rand::thread_rng()).unwrap();
+    let selected_message = ctx.data().meme_msgs.choose(&mut rand::thread_rng()).expect("TODO handle meme_msgs being empty");
     
-    // ctx.say(response).await?;
+    let image_url;
+    if selected_message.attachments.len() <= 0 {
+        image_url = &selected_message.attachments[0].url;
+    } else {
+        image_url = &selected_message.content;
+    }
+    ctx.say(image_url).await?;
     Ok(())
 }
