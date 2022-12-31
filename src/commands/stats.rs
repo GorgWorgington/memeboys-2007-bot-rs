@@ -24,6 +24,9 @@ pub async fn stats(
         ctx.say(format!("> **Meme count**\n> {}: {} memes posted", u, meme_message_count)).await?;
         return Ok(());
     } else {
+        // TODO: When we have a database, post a leaderboard of the top 10 users in addition to the author
+        let meme_message_count = get_meme_count(&ctx.author(), &ctx.data().meme_msgs);
+        ctx.say(format!("> **Meme count**\n> {}: {} memes posted", ctx.author(), meme_message_count)).await?;
         return Ok(()); 
     }
 }
