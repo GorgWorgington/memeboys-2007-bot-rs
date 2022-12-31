@@ -1,6 +1,6 @@
-use std::fs;
+use std::{fs};
 use commands::Data;
-use poise::serenity_prelude as serenity;
+use poise::{serenity_prelude::{self as serenity, ChannelId }, futures_util::StreamExt};
 
 mod commands;
 mod config;
@@ -28,6 +28,8 @@ async fn main() {
             commands: vec![
               commands::register(),
               commands::coinflip(),
+              commands::stats(),
+              commands::memeroll(),
               commands::react(),
               ],
             ..Default::default()
@@ -36,8 +38,32 @@ async fn main() {
         .intents(intents)
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
+                ctx.invisible().await;
+                let mut data = Data {
+                    meme_channel_id: ChannelId(274323160143233025),
+                    meme_msgs: Vec::new(),
+                };
+
+                let mut count = 0;
+
+                let mut messages = data.meme_channel_id.messages_iter(&ctx).boxed();
+                while let Some(message_result) = messages.next().await {
+                    match message_result {
+                        Ok(message) => {
+                            if message.embeds.len() > 0 {
+                                data.meme_msgs.push(message);
+                                count += 1;
+                                println!("added {} memes", count);
+                                // if count > 10 { break };
+                            }
+                        },
+                        Err(error) => eprintln!("Uh oh! Error: {}", error),
+                    }
+                }
+                println!("found {} memes", count);
+
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data {})
+                Ok(data)
             })
         });
 
