@@ -6,7 +6,6 @@ mod stats;
 use poise::serenity_prelude::ChannelId;
 use poise::serenity_prelude::Message;
 
-pub use self::age::*;
 pub use self::register::*;
 pub use self::coinflip::*;
 pub use self::memeroll::*;
