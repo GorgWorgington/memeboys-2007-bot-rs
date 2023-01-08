@@ -9,7 +9,8 @@ pub async fn memeroll(
     ctx: Context<'_>,
     #[description = "Caption"] caption: Option<String>,
 ) -> Result<(), Error> {
-    let selected_message = ctx.data().meme_msgs.choose(&mut rand::thread_rng()).expect("TODO handle meme_msgs being empty");
+    let meme_msgs_lock = ctx.data().meme_msgs.read().await;
+    let selected_message = &*meme_msgs_lock.choose(&mut rand::thread_rng()).expect("TODO handle meme_msgs being empty");
     
     let image_url;
     if selected_message.attachments.len() > 0 {

@@ -19,14 +19,14 @@ pub async fn stats(
     ctx: Context<'_>,
     #[description = "Selected user"] user: Option<serenity::User>,
 ) -> Result<(), Error> {
-    if let Some(u) = user.as_ref() {
-        let meme_message_count = get_meme_count(u, &ctx.data().meme_msgs);
-        ctx.say(format!("> **Meme count**\n> {}: {} memes posted", u, meme_message_count)).await?;
-        return Ok(());
-    } else {
-        // TODO: When we have a database, post a leaderboard of the top 10 users in addition to the author
-        let meme_message_count = get_meme_count(&ctx.author(), &ctx.data().meme_msgs);
-        ctx.say(format!("> **Meme count**\n> {}: {} memes posted", ctx.author(), meme_message_count)).await?;
-        return Ok(()); 
-    }
+    let user = match user.as_ref() {
+        Some(u) => u,
+        None => ctx.author(),
+    };
+
+    let meme_msgs_lock = ctx.data().meme_msgs.read().await;
+
+    let meme_message_count = get_meme_count(user, &*meme_msgs_lock);
+    ctx.say(format!("> **Meme count**\n> {}: {} memes posted", user, meme_message_count)).await?;
+    Ok(())
 }
