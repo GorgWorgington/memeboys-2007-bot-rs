@@ -1,19 +1,14 @@
-use commands::Data;
-use poise::{serenity_prelude::{self as serenity, ChannelId, RwLock }, futures_util::StreamExt};
 
-mod commands;
-use shuttle_runtime::Context as _;
-use shuttle_secrets::SecretStore;
+use crate::commands;
+use crate::config;
+use commands::{Data, Error};
+use poise::{serenity_prelude::{self as serenity, ChannelId, RwLock }, futures_util::StreamExt,};
 
+use config::Config;
 
-#[shuttle_runtime::main]
-async fn entrypoint(
-  #[shuttle_secrets::Secrets] secret_store: SecretStore,
-) -> shuttle_poise::ShuttlePoise<Data, commands::Error> {
-
-  let token = secret_store
-        .get("DISCORD_TOKEN")
-        .context("'DISCORD_TOKEN' was not found")?;
+pub async fn create_bot(cfg: Config) -> shuttle_service::ShuttlePoise<Data, Error> {
+    //Grab token from parsed config file
+  let token = cfg.token();
 
   // Set gateway intents, which decides what events the bot will be notified about
   let intents =
@@ -84,9 +79,8 @@ async fn entrypoint(
                 Ok(data)
             })
         })
-        .build()
-        .await
-        .map_err(shuttle_runtime::CustomError::new)?;
+        .build().await
+        .map_err(shuttle_service::error::CustomError::new)?;
 
-    Ok(framework.into())
+    Ok(framework)
 }

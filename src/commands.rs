@@ -19,5 +19,5 @@ pub struct Data {
   pub meme_msgs: RwLock<Vec<Message>>,
 }
 
-type Error = Box<dyn std::error::Error + Send + Sync>;
+pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
