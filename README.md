@@ -5,5 +5,5 @@ This repo was made for rust & discord bot learning purposes and for the sake of 
 
 To start bot:
 1. Must have `Secrets.toml` in project root with discord app token `DISCORD_TOKEN="foobar"`
-2. Run `cargo run`
+2. Run `cargo shuttle run`
 
