@@ -1,17 +1,16 @@
+use anyhow::Context as _;
 use commands::Data;
 use poise::{
     futures_util::StreamExt,
-    serenity_prelude::{self as serenity, ChannelId, RwLock},
+    serenity_prelude::{self as serenity, prelude::RwLock, ChannelId},
 };
+use shuttle_runtime::SecretStore;
+use shuttle_serenity::ShuttleSerenity;
 
 mod commands;
-use shuttle_runtime::Context as _;
-use shuttle_secrets::SecretStore;
 
 #[shuttle_runtime::main]
-async fn entrypoint(
-    #[shuttle_secrets::Secrets] secret_store: SecretStore,
-) -> shuttle_poise::ShuttlePoise<Data, commands::Error> {
+async fn entrypoint(#[shuttle_runtime::Secrets] secret_store: SecretStore) -> ShuttleSerenity {
     let token = secret_store
         .get("DISCORD_TOKEN")
         .context("'DISCORD_TOKEN' was not found")?;
@@ -33,7 +32,7 @@ async fn entrypoint(
             event_handler: |_ctx, event, _framework, data| {
                 Box::pin(async move {
                     match event {
-                        poise::Event::Message { new_message } => {
+                        poise::serenity_prelude::FullEvent::Message { new_message } => {
                             if new_message.channel_id == data.meme_channel_id
                                 && (new_message.embeds.len() > 0
                                     || new_message.attachments.len() > 0)
@@ -50,12 +49,10 @@ async fn entrypoint(
             },
             ..Default::default()
         })
-        .token(token)
-        .intents(intents)
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
-                ctx.invisible().await;
-                let meme_channel_id = ChannelId(274323160143233025);
+                ctx.invisible();
+                let meme_channel_id = ChannelId::new(274323160143233025);
                 let mut meme_msgs = Vec::new();
 
                 let mut count = 0;
@@ -86,9 +83,12 @@ async fn entrypoint(
                 Ok(data)
             })
         })
-        .build()
-        .await
-        .map_err(shuttle_runtime::CustomError::new)?;
+        .build();
 
-    Ok(framework.into())
+    let client = serenity::ClientBuilder::new(token, intents)
+        .framework(framework)
+        .await
+        .expect("Error creating serenity client");
+
+    Ok(client.into())
 }
